@@ -1,3 +1,4 @@
+# qr_scanner.py
 from PIL import Image
 from pyzbar.pyzbar import decode
 import urllib.parse

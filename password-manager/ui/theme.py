@@ -1,61 +1,93 @@
+# ui/theme.py
 import json
 import tempfile
 import os
 import customtkinter as ctk
 
-MATRIX_FONT = "Courier New"
+# Moderne System-Schriftart
+UI_FONT = "Segoe UI" if os.name == "nt" else "Helvetica Neue"
 
-MATRIX_THEME = {
-    "CTkFont": {"family": "Courier New", "size": 13, "weight": "normal"},
-    "CTk": {"fg_color": ["#050505", "#050505"]},
+MODERN_MATRIX_THEME = {
+    "CTkFont": {
+        "family": UI_FONT,
+        "size": 13,
+        "weight": "normal"
+    },
+    "CTk": {
+        "fg_color": ["#0B0F17", "#0B0F17"] # Tiefer, eleganter Dark-Hintergrund
+    },
     "CTkFrame": {
-        "corner_radius": 6, "border_width": 1,
-        "fg_color": ["#0A0A0A", "#0A0A0A"], "top_fg_color": ["#111111", "#111111"],
-        "border_color": ["#00FF41", "#00FF41"]
+        "corner_radius": 10,
+        "border_width": 1,
+        "fg_color": ["#111827", "#111827"],
+        "top_fg_color": ["#1F2937", "#1F2937"],
+        "border_color": ["#1F2937", "#1F2937"] # Dezent dunkler Rand statt Neongrün
     },
     "CTkButton": {
-        "corner_radius": 4, "border_width": 1,
-        "fg_color": ["#003B00", "#003B00"], "hover_color": ["#00FF41", "#00FF41"],
-        "border_color": ["#00FF41", "#00FF41"], "text_color": ["#00FF41", "#000000"],
-        "text_color_disabled": ["#005511", "#005511"]
+        "corner_radius": 8,
+        "border_width": 0,
+        "fg_color": ["#059669", "#059669"],       # Modernes Emerald-Grün
+        "hover_color": ["#10B981", "#10B981"],    # Helleres Grün bei Hover
+        "border_color": ["#10B981", "#10B981"],
+        "text_color": ["#FFFFFF", "#FFFFFF"],     # Weißer Text für gute Lesbarkeit
+        "text_color_disabled": ["#4B5563", "#4B5563"]
     },
-    "CTkLabel": {"corner_radius": 0, "fg_color": "transparent", "text_color": ["#00FF41", "#00FF41"]},
+    "CTkLabel": {
+        "corner_radius": 0,
+        "fg_color": "transparent",
+        "text_color": ["#F3F4F6", "#F3F4F6"]      # Helles Soft-Weiß statt grelles Grün
+    },
     "CTkEntry": {
-        "corner_radius": 4, "border_width": 1,
-        "fg_color": ["#050505", "#050505"], "border_color": ["#00FF41", "#00FF41"],
-        "text_color": ["#00FF41", "#00FF41"], "placeholder_text_color": ["#005511", "#005511"]
+        "corner_radius": 8,
+        "border_width": 1,
+        "fg_color": ["#1F2937", "#1F2937"],
+        "border_color": ["#374151", "#374151"],
+        "text_color": ["#F9FAFB", "#F9FAFB"],
+        "placeholder_text_color": ["#6B7280", "#6B7280"]
     },
     "CTkProgressBar": {
-        "corner_radius": 4, "border_width": 1,
-        "fg_color": ["#0A0A0A", "#0A0A0A"], "progress_color": ["#00FF41", "#00FF41"],
-        "border_color": ["#00FF41", "#00FF41"]
+        "corner_radius": 6,
+        "border_width": 0,
+        "fg_color": ["#1F2937", "#1F2937"],
+        "progress_color": ["#10B981", "#10B981"],
+        "border_color": ["#1F2937", "#1F2937"]
     },
     "CTkCheckBox": {
-        "corner_radius": 4, "border_width": 2,
-        "fg_color": ["#00FF41", "#00FF41"], "border_color": ["#00FF41", "#00FF41"],
-        "hover_color": ["#003B00", "#003B00"], "checkmark_color": ["#000000", "#000000"],
-        "text_color": ["#00FF41", "#00FF41"], "text_color_disabled": ["#005511", "#005511"]
+        "corner_radius": 6,
+        "border_width": 2,
+        "fg_color": ["#10B981", "#10B981"],
+        "border_color": ["#4B5563", "#4B5563"],
+        "hover_color": ["#059669", "#059669"],
+        "checkmark_color": ["#FFFFFF", "#FFFFFF"],
+        "text_color": ["#E5E7EB", "#E5E7EB"],
+        "text_color_disabled": ["#4B5563", "#4B5563"]
     },
     "DropdownMenu": {
-        "fg_color": ["#0A0A0A", "#0A0A0A"], "hover_color": ["#003B00", "#003B00"],
-        "text_color": ["#00FF41", "#00FF41"]
+        "fg_color": ["#1F2937", "#1F2937"],
+        "hover_color": ["#374151", "#374151"],
+        "text_color": ["#F9FAFB", "#F9FAFB"]
     },
     "CTkOptionMenu": {
-        "corner_radius": 4, "fg_color": ["#003B00", "#003B00"],
-        "button_color": ["#00FF41", "#00FF41"], "button_hover_color": ["#009922", "#009922"],
-        "text_color": ["#00FF41", "#00FF41"], "text_color_disabled": ["#005511", "#005511"]
+        "corner_radius": 8,
+        "fg_color": ["#1F2937", "#1F2937"],
+        "button_color": ["#10B981", "#10B981"],
+        "button_hover_color": ["#059669", "#059669"],
+        "text_color": ["#F9FAFB", "#F9FAFB"],
+        "text_color_disabled": ["#4B5563", "#4B5563"]
     },
     "CTkScrollbar": {
-        "corner_radius": 4, "border_spacing": 2,
-        "fg_color": "transparent", "button_color": ["#003B00", "#003B00"],
-        "button_hover_color": ["#00FF41", "#00FF41"]
+        "corner_radius": 6,
+        "border_spacing": 2,
+        "fg_color": "transparent",
+        "button_color": ["#374151", "#374151"],
+        "button_hover_color": ["#4B5563", "#4B5563"]
     }
 }
 
 def apply_matrix_theme():
     """Erstellt temporär die JSON-Themedatei und lädt sie in CustomTkinter."""
     with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False, encoding='utf-8') as f:
-        json.dump(MATRIX_THEME, f)
+        json.dump(MODERN_MATRIX_THEME, f)
         temp_path = f.name
     ctk.set_appearance_mode("Dark")
     ctk.set_default_color_theme(temp_path)

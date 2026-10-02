@@ -1,6 +1,9 @@
+# crypto.py
 import base64
 import os
 import json
+import secrets
+import string
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -48,3 +51,9 @@ def create_encrypted_backup(all_db_rows, fernet: Fernet, export_file_path: str):
     
     with open(export_file_path, "w", encoding="utf-8") as f:
         f.write(encrypted_payload)
+
+# NEUE FUNKTION: Passwort-Generator
+def generate_secure_password(length: int = 16) -> str:
+    """Generiert ein kryptografisch sicheres Zufallspasswort."""
+    alphabet = string.ascii_letters + string.digits + "!@#$%^&*()_+-=[]{}|;:,.<>?"
+    return ''.join(secrets.choice(alphabet) for _ in range(length))
