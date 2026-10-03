@@ -1,16 +1,21 @@
 import customtkinter as ctk
-from ui.theme import UI_FONT
+from services import SecurityService
+from ui.dialogs.master_key_widgets import (
+    build_dialog_header, 
+    create_password_entry, 
+    create_button_bar
+)
 
 class ChangeMasterKeyDialog(ctk.CTkToplevel):
     def __init__(self, parent, on_success_callback):
         super().__init__(parent, fg_color="#0B0F17")
         self.on_success = on_success_callback
-        
+        self.service = SecurityService()
+
         self.title("Change Master Key")
         self.geometry("420x260")
         self.resizable(False, False)
 
-        # Modal Window Setup
         self.transient(parent)
         self.grab_set()
 
@@ -23,55 +28,12 @@ class ChangeMasterKeyDialog(ctk.CTkToplevel):
         )
         container.pack(fill="both", expand=True, padx=20, pady=20)
 
-        ctk.CTkLabel(
-            container, 
-            text="Change Master Key", 
-            font=ctk.CTkFont(family=UI_FONT, size=18, weight="bold"), 
-            text_color="#F3F4F6"
-        ).pack(anchor="w", padx=15, pady=(15, 2))
-
-        ctk.CTkLabel(
-            container, 
-            text="Re-encrypts the vault with a new password.", 
-            font=ctk.CTkFont(family=UI_FONT, size=12), 
-            text_color="#9CA3AF"
-        ).pack(anchor="w", padx=15, pady=(0, 15))
-
-        self.entry_new = ctk.CTkEntry(
-            container, 
-            show="*", 
-            placeholder_text="Enter new master password...",
-            font=ctk.CTkFont(family=UI_FONT, size=13),
-            height=38,
-            fg_color="#1F2937",
-            border_color="#374151",
-            text_color="#F9FAFB"
-        )
-        self.entry_new.pack(fill="x", padx=15, pady=(0, 15))
+        # UI Komponenten aufbauen
+        build_dialog_header(container)
+        self.entry_new = create_password_entry(container)
         self.entry_new.bind("<Return>", lambda e: self._on_submit())
 
-        btn_frame = ctk.CTkFrame(container, fg_color="transparent")
-        btn_frame.pack(fill="x", padx=15, pady=(0, 15))
-
-        ctk.CTkButton(
-            btn_frame, 
-            text="Cancel", 
-            command=self.destroy,
-            font=ctk.CTkFont(family=UI_FONT, size=12, weight="bold"),
-            fg_color="#374151",
-            hover_color="#4B5563",
-            width=100,
-            height=36
-        ).pack(side="left")
-
-        ctk.CTkButton(
-            btn_frame, 
-            text="Re-encrypt Vault", 
-            command=self._on_submit,
-            font=ctk.CTkFont(family=UI_FONT, size=12, weight="bold"),
-            width=140,
-            height=36
-        ).pack(side="right")
+        create_button_bar(container, on_cancel=self.destroy, on_submit=self._on_submit)
 
         self.update_idletasks()
         self.after(10, self.focus_force)
@@ -79,7 +41,7 @@ class ChangeMasterKeyDialog(ctk.CTkToplevel):
 
     def _on_submit(self):
         new_pw = self.entry_new.get().strip()
-        if new_pw and len(new_pw) >= 4:
+        if self.service.validate_master_password(new_pw):
             self.on_success(new_pw)
             self.destroy()
         else:

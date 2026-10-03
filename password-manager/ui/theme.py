@@ -1,41 +1,39 @@
-# ui/theme.py
 import json
 import tempfile
 import os
 import customtkinter as ctk
 
-# Moderne System-Schriftart
 UI_FONT = "Segoe UI" if os.name == "nt" else "Helvetica Neue"
 
-MODERN_MATRIX_THEME = {
+DARK_THEME = {
     "CTkFont": {
         "family": UI_FONT,
         "size": 13,
         "weight": "normal"
     },
     "CTk": {
-        "fg_color": ["#0B0F17", "#0B0F17"] # Tiefer, eleganter Dark-Hintergrund
+        "fg_color": ["#0B0F17", "#0B0F17"]
     },
     "CTkFrame": {
         "corner_radius": 10,
         "border_width": 1,
         "fg_color": ["#111827", "#111827"],
         "top_fg_color": ["#1F2937", "#1F2937"],
-        "border_color": ["#1F2937", "#1F2937"] # Dezent dunkler Rand statt Neongrün
+        "border_color": ["#1F2937", "#1F2937"]
     },
     "CTkButton": {
         "corner_radius": 8,
         "border_width": 0,
-        "fg_color": ["#059669", "#059669"],       # Modernes Emerald-Grün
-        "hover_color": ["#10B981", "#10B981"],    # Helleres Grün bei Hover
+        "fg_color": ["#059669", "#059669"],
+        "hover_color": ["#10B981", "#10B981"],
         "border_color": ["#10B981", "#10B981"],
-        "text_color": ["#FFFFFF", "#FFFFFF"],     # Weißer Text für gute Lesbarkeit
+        "text_color": ["#FFFFFF", "#FFFFFF"],
         "text_color_disabled": ["#4B5563", "#4B5563"]
     },
     "CTkLabel": {
         "corner_radius": 0,
         "fg_color": "transparent",
-        "text_color": ["#F3F4F6", "#F3F4F6"]      # Helles Soft-Weiß statt grelles Grün
+        "text_color": ["#F3F4F6", "#F3F4F6"]
     },
     "CTkEntry": {
         "corner_radius": 8,
@@ -84,10 +82,9 @@ MODERN_MATRIX_THEME = {
     }
 }
 
-def apply_matrix_theme():
-    """Erstellt temporär die JSON-Themedatei und lädt sie in CustomTkinter."""
+def apply_dark_theme():
     with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False, encoding='utf-8') as f:
-        json.dump(MODERN_MATRIX_THEME, f)
+        json.dump(DARK_THEME, f)
         temp_path = f.name
     ctk.set_appearance_mode("Dark")
     ctk.set_default_color_theme(temp_path)

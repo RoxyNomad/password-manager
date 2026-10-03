@@ -1,14 +1,17 @@
-import database
-import crypto
-
-CLIPBOARD_TIMEOUT_SEC = 15
+from services import ClipboardService, CLIPBOARD_TIMEOUT_SEC
 
 class ClipboardManager:
     def __init__(self, app):
         self.app = app
 
+    @property
+    def service(self):
+        return ClipboardService(self.app.fernet)
+
     def copy_username(self):
         v = self.app.current_view
+        if not hasattr(v, 'tree'):
+            return
         selected = v.tree.selection()
         if selected:
             user = v.tree.item(selected[0], "values")[4]
@@ -16,24 +19,25 @@ class ClipboardManager:
 
     def copy_password(self):
         v = self.app.current_view
+        if not hasattr(v, 'tree'):
+            return
         selected = v.tree.selection()
         if selected:
             entry_id = v.tree.item(selected[0], "values")[0]
-            for row in database.get_all_entries():
-                if str(row[0]) == str(entry_id):
-                    pw = crypto.decrypt_text(self.app.fernet, row[3])
-                    self.set_clipboard(pw, "PASSWORD")
-                    break
+            pw = self.service.get_decrypted_password(entry_id)
+            if pw:
+                self.set_clipboard(pw, "PASSWORD")
 
     def copy_totp(self):
         v = self.app.current_view
+        if not hasattr(v, 'tree'):
+            return
         selected = v.tree.selection()
         if selected:
             code = v.tree.item(selected[0], "values")[6]
             if code not in ["---", "INVALID"]:
                 self.set_clipboard(code, "2FA CODE")
 
-    # Weiterleitung für den EntryHandler
     def copy_to_clipboard(self, text: str, label: str):
         self.set_clipboard(text, label)
 
@@ -44,13 +48,13 @@ class ClipboardManager:
         self.start_autoclear(label)
 
     def start_autoclear(self, label: str):
-        if hasattr(self.app, 'clipboard_timer') and self.app.clipboard_timer:
+        if getattr(self.app, 'clipboard_timer', None):
             self.app.root.after_cancel(self.app.clipboard_timer)
         self.app.clipboard_seconds_left = CLIPBOARD_TIMEOUT_SEC
         self._tick(label)
 
     def _tick(self, label: str):
-        v = self.app.current_view
+        v = getattr(self.app, 'current_view', None)
         if self.app.clipboard_seconds_left > 0:
             if hasattr(v, 'show_clipboard_timer'):
                 v.show_clipboard_timer(label, self.app.clipboard_seconds_left, CLIPBOARD_TIMEOUT_SEC)
@@ -64,6 +68,9 @@ class ClipboardManager:
             self.app.root.clipboard_clear()
         except Exception:
             pass
-        if hasattr(self.app, 'current_view') and hasattr(self.app.current_view, 'hide_clipboard_timer'):
-            self.app.current_view.hide_clipboard_timer()
+
+        v = getattr(self.app, 'current_view', None)
+        if hasattr(v, 'hide_clipboard_timer'):
+            v.hide_clipboard_timer()
+
         self.app.clipboard_timer = None
